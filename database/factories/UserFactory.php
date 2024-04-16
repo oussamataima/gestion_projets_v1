@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Profession;
+use App\Models\Skill;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -24,14 +27,24 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
+            'username' => fake()->userName(),
+            'email' => fake()->email(),
+            'full_name' => fake()->name(),
+            
             'password' => static::$password ??= Hash::make('password'),
+            'role' => 'employer',
+            'profession_id' => Profession::inRandomOrder()->first()->id,
             'remember_token' => Str::random(10),
         ];
     }
 
+    public function configure()
+    {
+        return $this->afterCreating(function (User $user) {
+            $skills = Skill::inRandomOrder()->take(rand(3, 8))->get();
+            $user->skills()->attach($skills);
+        });
+    }
     /**
      * Indicate that the model's email address should be unverified.
      */
