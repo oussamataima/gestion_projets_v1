@@ -6,7 +6,7 @@ git clone https://github.com/oussamataima/gestion_projets_v1.git
 
 &&
 
-cd livewire-crud
+cd gestion_projets_v1
 ```
 
 - Install composer dependencies
