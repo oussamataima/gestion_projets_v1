@@ -61,7 +61,7 @@ new class extends Component {
             $this->user->update($data);
             $this->user->skills()->sync($this->skills);
 
-            if($this->avatar) {
+            if($this->avatar && !$this->user->avatar) {
                 $url = $this->avatar->store('users', 'public');
                 // $this->user->update(['avatar' => $url]);
                 // dd($this->avatar);

@@ -67,7 +67,7 @@ new class extends Component {
                 $user->update(['avatar' => url("/storage/$url")]);
             }
 
-            $this->success('User has been created', redirectTo: "/employer");
+            $this->success('User has been created', redirectTo: route('employers.index'));
         }
 
     

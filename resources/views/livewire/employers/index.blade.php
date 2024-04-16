@@ -41,7 +41,7 @@ new class extends Component {
     public function headers(): array
     {
         return [
-            ['key' => 'id', 'label' => '#', 'class' => 'w-1'],
+            ['key' => 'avatar', 'label' => '#', 'class' => 'w-20'],
             ['key' => 'full_name', 'label' => 'Full name', 'class' => 'w-48'],
             ['key' => 'username', 'label' => 'Username', 'class' => 'w-40'],
             ['key' => 'profession.name', 'label' => 'Profession', 'class' => 'w-28'],
@@ -101,6 +101,9 @@ new class extends Component {
     <!-- TABLE  -->
     <x-card>
         <x-table :headers="$headers" :rows="$users" :sort-by="$sortBy" with-pagination>
+            @scope('cell_avatar', $user)
+                <img class="rounded-full" src="{{$user->avatar ?? "/empty-user.jpg"}}" />
+            @endscope
             @scope('actions', $user)
             <div class="flex flex-nowrap gap-2">
                 <x-button link="{{ route('employers.edit', $user) }}" icon="o-pencil" class="btn-sm btn-ghost" />
