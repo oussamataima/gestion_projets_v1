@@ -11,6 +11,7 @@ use Livewire\Attributes\Url;
 
 new class extends Component {
     use Toast;
+    use WithPagination;
 
     #[Url]
     public string $search = '';
@@ -29,15 +30,18 @@ new class extends Component {
     // Delete action
     public function delete($id): void
     {
-        User::find($id)->delete();
-        $this->warning("Will delete #$id", 'It is fake.', position: 'toast-bottom');
+        DB::transaction(function () use ($id) {
+            User::find($id)->deleteSkills();
+            User::find($id)->delete();
+        });
+        $this->warning("Deleted user #$id", '', position: 'toast-bottom'); // Removed fake message
     }
 
     // Table headers
     public function headers(): array
     {
         return [
-            ['key' => 'id', 'label' => '#', 'class' => 'w-1'],
+            ['key' => 'avatar', 'label' => '#', 'class' => 'w-20'],
             ['key' => 'full_name', 'label' => 'Full name', 'class' => 'w-48'],
             ['key' => 'username', 'label' => 'Username', 'class' => 'w-40'],
             ['key' => 'email', 'label' => 'E-mail', 'sortable' => false],
@@ -50,7 +54,7 @@ new class extends Component {
      * On real projects you do it with Eloquent collections.
      * Please, refer to maryUI docs to see the eloquent examples.
      */
-    public function users(): Collection
+    public function users(): LengthAwarePaginator
     {
         // return collect([
         //     ['id' => 1, 'name' => 'Mary', 'email' => 'mary@mary-ui.com', 'age' => 23],
@@ -67,7 +71,7 @@ new class extends Component {
         ->where('role','manager') 
         ->where('full_name', 'like', "%$this->search%")
         // ->orderBy(...array_values($this->sortBy))
-        ->get();
+        ->paginate(10);
     }
 
     public function with(): array
@@ -88,13 +92,24 @@ new class extends Component {
         {{-- <x-slot:actions>
             <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" />
         </x-slot:actions> --}}
+        <x-slot:actions>
+        <x-button icon="o-user-plus" class="btn-primary" link="{{route('managers.create')}}">
+                Add manager
+            </x-button>
+        </x-slot:actions>
     </x-header>
 
     <!-- TABLE  -->
     <x-card>
-        <x-table :headers="$headers" :rows="$users" :sort-by="$sortBy">
+        <x-table :headers="$headers" :rows="$users" :sort-by="$sortBy" with-pagination>
+            @scope('cell_avatar', $user)
+                <img class="rounded-full" src="{{$user->avatar ?? "/empty-user.jpg"}}" />
+            @endscope
             @scope('actions', $user)
+            <div class="flex flex-nowrap gap-2">
+            <x-button link="{{ route('managers.edit', $user) }}" icon="o-pencil" class="btn-sm btn-ghost" />
             <x-button icon="o-trash" wire:click="delete({{ $user['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
+            </div>
             @endscope
         </x-table>
     </x-card>
@@ -112,3 +127,26 @@ new class extends Component {
 {{-- <h1>list users
 
 </h1> --}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
