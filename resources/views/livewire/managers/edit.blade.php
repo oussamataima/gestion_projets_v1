@@ -57,7 +57,7 @@ new class extends Component {
             $this->user->update($data);
             
 
-            if($this->avatar && !$this->user->avatar) {
+            if($this->avatar !== $this->user->avatar) {
                 $url = $this->avatar->store('users', 'public');
                 // $this->user->update(['avatar' => $url]);
                 // dd($this->avatar);

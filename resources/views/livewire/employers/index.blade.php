@@ -34,7 +34,7 @@ new class extends Component {
             User::find($id)->deleteSkills();
             User::find($id)->delete();
         });
-        $this->warning("Deleted user #$id", '', position: 'toast-bottom'); // Removed fake message
+        $this->warning("Deleted user #$id", '', position: 'toast-bottom'); 
     }
 
     // Table headers
