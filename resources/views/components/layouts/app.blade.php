@@ -55,6 +55,7 @@
                     <x-menu-item title="Employers" icon="o-user" link="{{route('employers.index')}}" />
                     <x-menu-item title="Managers" icon="o-user" link="{{route('managers.index')}}" />
                 </x-menu-sub>
+                <x-menu-item title="project" icon="o-user" link="{{route('projects.index')}}" />
             </x-menu>
         </x-slot:sidebar>
 
