@@ -53,6 +53,23 @@ class User extends Authenticatable
     }
 
 
+    
+    // Get the projects that the admin has created.
+    public function projects()
+    {
+        return $this->hasMany(Project::class, 'created_by');
+    }
+
+    /**
+     * Get the projects that the manager is assigned to .
+     * 
+     */
+    public function managedProjects()
+    {
+        return $this->belongsToMany(Project::class, 'assigned_to');
+    }
+
+
     /**
      * The attributes that should be hidden for serialization.
      *
