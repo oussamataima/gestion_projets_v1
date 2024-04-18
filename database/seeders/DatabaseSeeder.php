@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Profession;
+use App\Models\Project;
 use App\Models\Skill;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -18,5 +19,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ProfessionSeeder::class);
         $this->call(SkillSeeder::class);
         User::factory(100)->create();
+        Project::factory(30)->create();
     }
 }
