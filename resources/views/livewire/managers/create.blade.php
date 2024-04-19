@@ -39,21 +39,8 @@ new class extends Component {
     
     #[Rule('required')]
     public string $password_confirmation = '';
-    // public string $role = '';
-
-
-    
-    
-        // $data = $this->validate(); 
-        // $data['role'] = 'employer';
-        // $data['password'] = Hash::make($data['password']);
-        // dd($data);
- 
-        // $user = User::create($data);
-        // // dd($data);
-        // $this->success('Employer created.', redirectTo: "/employer");
         
-        public function save(): void
+    public function save(): void
         {
 
             $data = $this->validate(); 
@@ -67,7 +54,7 @@ new class extends Component {
                 $user->update(['avatar' => url("/storage/$url")]);
             }
 
-            $this->success('User has been created', redirectTo: "/managers");
+            $this->success('User has been created', redirectTo: route('managers.index'));
         }
 
     

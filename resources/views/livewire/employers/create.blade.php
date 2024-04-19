@@ -15,7 +15,7 @@ new class extends Component {
     use WithFileUploads;
 
 
-    // #[Validate('image|max:1024')]
+    #[Validate('image|max:1024')]
     public $avatar;
 
     #[Rule('required')]

@@ -7,6 +7,9 @@
     <title>{{ isset($title) ? $title.' - '.config('app.name') : config('app.name') }}</title>
     {{-- Cropper.js --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+        {{-- Flatpickr  --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -55,7 +58,7 @@
                     <x-menu-item title="Employers" icon="o-user" link="{{route('employers.index')}}" />
                     <x-menu-item title="Managers" icon="o-user" link="{{route('managers.index')}}" />
                 </x-menu-sub>
-                <x-menu-item title="project" icon="o-user" link="{{route('projects.index')}}" />
+                <x-menu-item title="Projects" icon="o-square-2-stack" link="{{route('projects.index')}}" />
             </x-menu>
         </x-slot:sidebar>
 

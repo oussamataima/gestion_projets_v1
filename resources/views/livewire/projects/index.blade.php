@@ -50,9 +50,8 @@ new class extends Component {
     public function headers(): array
     {
         return [
-            // ['key' => 'id', 'label' => '#', 'class' => 'w-20'],
-            ['key' => 'name', 'label' => 'Full name', 'class' => 'w-35'],
-            // ['key' => 'description', 'label' => 'description', 'class' => 'w-50'],
+            ['key' => 'id', 'label' => '#', 'class' => 'w-20'],
+            ['key' => 'name', 'label' => 'Project name', 'class' => 'w-35'],
             ['key' => 'start_date', 'label' => 'start date', 'class' => 'w-28'],
             ['key' => 'due_date', 'label' => 'due    date', 'sortable' => 'w-23'],
             ['key' => 'status', 'label' => 'status', 'sortable' => 'w-10'],
@@ -96,7 +95,7 @@ new class extends Component {
 
     <!-- TABLE  -->
     <x-card>
-        <x-table :headers="$headers" :rows="$projects" :sort-by="$sortBy" with-pagination>
+        <x-table :headers="$headers" :rows="$projects"  with-pagination>
             
             @scope('actions', $project)
             <div class="flex flex-nowrap gap-2">
