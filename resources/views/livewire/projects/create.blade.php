@@ -18,6 +18,7 @@ new class extends Component {
 
     public int $manager_id ;
 
+
     #[Validate('required|date')]
     public string  $start_date ;
 
@@ -33,6 +34,7 @@ new class extends Component {
             $data['start_date'] = $this->start_date;
             $data['due_date'] = $this->due_date;
             $project = Project::create($data);
+            dd($this->status);
             if($project) {
                 $this->success('Project has been created', redirectTo: route('projects.index'));
             } else {
@@ -46,11 +48,13 @@ new class extends Component {
             'users' =>  User::query()
                         ->select(['id','full_name', 'avatar' ,'role' , 'username'])
                         ->where('role','manager') 
-                        ->get()
+                        ->get(),
         ];
     }
     
 }; ?>
+
+
 <div>
     <x-header title="Create Project" separator />
     <div class="max-w-[700px] mx-auto">

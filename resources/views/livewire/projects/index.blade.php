@@ -87,7 +87,7 @@ new class extends Component {
         </x-slot:middle>
         <x-slot:actions>
             {{-- <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" /> --}}
-            <x-button icon="o-user-plus" class="btn-primary" link="{{route('projects.create')}}">
+            <x-button icon="o-plus" class="btn-primary" link="{{route('projects.create')}}">
                 Add project
             </x-button>
         </x-slot:actions>
