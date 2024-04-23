@@ -30,6 +30,9 @@ new class extends Component {
     // Delete action
     public function delete($id): void
     {
+        if(!auth()->user()->isAdmin()) {
+                return;
+            }
         DB::transaction(function () use ($id) {
             User::find($id)->deleteSkills();
             User::find($id)->delete();
@@ -80,9 +83,11 @@ new class extends Component {
             <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" />
         </x-slot:actions> --}}
         <x-slot:actions>
-        <x-button icon="o-user-plus" class="btn-primary" link="{{route('managers.create')}}">
-                Add manager
-            </x-button>
+            @if(auth()->user()->isAdmin())
+                <x-button icon="o-user-plus" class="btn-primary" link="{{route('managers.create')}}">
+                        Add manager
+                </x-button>
+            @endif
         </x-slot:actions>
     </x-header>
 
@@ -92,12 +97,14 @@ new class extends Component {
             @scope('cell_avatar', $user)
                 <img class="rounded-full" src="{{$user->avatar ?? "/empty-user.jpg"}}" />
             @endscope
-            @scope('actions', $user)
-            <div class="flex flex-nowrap gap-2">
-            <x-button link="{{ route('managers.edit', $user) }}" icon="o-pencil" class="btn-sm btn-ghost" />
-            <x-button icon="o-trash" wire:click="delete({{ $user['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
-            </div>
-            @endscope
+            @if(auth()->user()->isAdmin())
+                @scope('actions', $user)
+                <div class="flex flex-nowrap gap-2">
+                <x-button link="{{ route('managers.edit', $user) }}" icon="o-pencil" class="btn-sm btn-ghost" />
+                <x-button icon="o-trash" wire:click="delete({{ $user['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
+                </div>
+                @endscope
+            @endif
         </x-table>
     </x-card>
 

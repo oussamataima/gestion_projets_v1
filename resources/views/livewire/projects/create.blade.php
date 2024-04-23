@@ -27,7 +27,9 @@ new class extends Component {
 
     public function save(): void
         {
-
+            if(!auth()->user()->isAdmin()) {
+                return;
+            }
             $data = $this->validate();
             $data['assigned_to'] = $this->manager_id;
             $data['created_by'] = auth()->user()->id;

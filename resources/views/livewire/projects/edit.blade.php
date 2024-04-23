@@ -37,7 +37,10 @@ new class extends Component {
 
     public function save(): void
         {
-
+            if(!auth()->user()->isAdmin()) {
+                return;
+            }
+            
             $data = $this->validate();
             $data['assigned_to'] = $this->assigned_to;
             $data['status'] = $this->status;

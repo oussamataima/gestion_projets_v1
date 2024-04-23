@@ -69,6 +69,16 @@ class User extends Authenticatable
         return $this->belongsToMany(Project::class, 'assigned_to');
     }
 
+    public function projects_employer()
+    {
+        return $this->belongsToMany(Project::class, 'project_user', 'user_id', 'project_id');
+    }
+
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
 
     /**
      * The attributes that should be hidden for serialization.

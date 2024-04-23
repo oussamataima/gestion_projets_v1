@@ -31,20 +31,23 @@ new class extends Component {
 
     // Delete action
     public function delete($id): void
-{
-    $project = Project::find($id);
+    {
+        if(!auth()->user()->isAdmin()) {
+                    return;
+                }
+        $project = Project::find($id);
 
-    if ($project) {
-        DB::transaction(function () use ($project) {
-            // Supprimer le projet et ses éventuelles dépendances dans une transaction
-            $project->delete();
-        });
+        if ($project) {
+            DB::transaction(function () use ($project) {
+                // Supprimer le projet et ses éventuelles dépendances dans une transaction
+                $project->delete();
+            });
 
-        $this->warning("Deleted project #$id", '', position: 'toast-bottom'); // Message de confirmation
-    } else {
-        $this->warning("Project #$id not found", '', position: 'toast-bottom'); // Message si le projet n'est pas trouvé
+            $this->warning("Deleted project #$id", '', position: 'toast-bottom'); // Message de confirmation
+        } else {
+            $this->warning("Project #$id not found", '', position: 'toast-bottom'); // Message si le projet n'est pas trouvé
+        }
     }
-}
 
     // Table headers
     public function headers(): array
@@ -52,9 +55,9 @@ new class extends Component {
         return [
             ['key' => 'id', 'label' => '#', 'class' => 'w-20'],
             ['key' => 'name', 'label' => 'Project name', 'class' => 'w-35'],
-            ['key' => 'start_date', 'label' => 'start date', 'class' => 'w-28'],
-            ['key' => 'due_date', 'label' => 'due    date', 'sortable' => 'w-23'],
-            ['key' => 'status', 'label' => 'status', 'sortable' => 'w-10'],
+            ['key' => 'start_date', 'label' => 'Start date', 'class' => 'w-28'],
+            ['key' => 'due_date', 'label' => 'Due date', 'class' => 'w-23'],
+            ['key' => 'status', 'label' => 'Status', 'class' => 'w-10'],
         ];
     }
 
@@ -87,23 +90,43 @@ new class extends Component {
         </x-slot:middle>
         <x-slot:actions>
             {{-- <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" /> --}}
+            @if(auth()->user()->isAdmin())
             <x-button icon="o-plus" class="btn-primary" link="{{route('projects.create')}}">
                 Add project
             </x-button>
+            @endif
         </x-slot:actions>
     </x-header>
 
     <!-- TABLE  -->
     <x-card>
-        <x-table :headers="$headers" :rows="$projects"  with-pagination>
-            
-            @scope('actions', $project)
-            <div class="flex flex-nowrap gap-2">
-                <x-button link="{{ route('projects.edit', $project) }}" icon="o-pencil" class="btn-sm btn-ghost" />
-                <x-button icon="o-trash" wire:click="delete({{ $project['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
-            </div>
-            
+        <x-table :headers="$headers" :rows="$projects"  with-pagination link="/projects/{id}">
+            @if(auth()->user()->isAdmin())
+                @scope('actions', $project)
+                    <div class="flex flex-nowrap gap-2">
+                        <x-button link="{{ route('projects.edit', $project) }}" icon="o-pencil" class="btn-sm btn-ghost" />
+                        <x-button icon="o-trash" wire:click="delete({{ $project['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
+                    </div>
+                @endscope
+            @endif
+
+            @scope('cell_status', $project)
+                @switch($project->status)
+                    @case("pending")
+                        <x-badge value="{{$project->status}}" class="capitalize badge badge-outline badge-warning" />               
+                    @break
+                    @case("in_progress")
+                        <x-badge value="{{$project->status}}" class="capitalize badge badge-outline badge-primary" />               
+                    @break
+                    @case("completed")
+                        <x-badge value="{{$project->status}}" class="capitalize badge badge-outline badge-success" />               
+                    @break
+                
+                    @default
+                        
+                @endswitch
             @endscope
+           
         </x-table>
     </x-card>
 

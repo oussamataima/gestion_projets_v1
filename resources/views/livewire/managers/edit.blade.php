@@ -39,8 +39,6 @@ new class extends Component {
             'email' => 'required|email|unique:users,email,' . $this->user->id,
         ];
     }
-
-
     public function mount(): void
     {
         $this->fill($this->user);
@@ -50,7 +48,9 @@ new class extends Component {
         
         public function save(): void
         {
-
+            if(!auth()->user()->isAdmin()) {
+                return;
+            }
             $data = $this->validate(); 
             $data['role'] = 'manager';
             
@@ -59,8 +59,6 @@ new class extends Component {
 
             if($this->avatar !== $this->user->avatar) {
                 $url = $this->avatar->store('users', 'public');
-                // $this->user->update(['avatar' => $url]);
-                // dd($this->avatar);
                 $this->user->update(['avatar' => url("/storage/$url")]);
 
             }

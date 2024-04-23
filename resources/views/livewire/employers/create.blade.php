@@ -39,22 +39,13 @@ new class extends Component {
     
     #[Rule('required')]
     public string $password_confirmation = '';
-    // public string $role = '';
 
-
-    
-    
-        // $data = $this->validate(); 
-        // $data['role'] = 'employer';
-        // $data['password'] = Hash::make($data['password']);
-        // dd($data);
- 
-        // $user = User::create($data);
-        // // dd($data);
-        // $this->success('Employer created.', redirectTo: "/employer");
         
         public function save(): void
         {
+            if(!auth()->user()->isAdmin()) {
+                return;
+            }
 
             $data = $this->validate(); 
             $data['role'] = 'employer';

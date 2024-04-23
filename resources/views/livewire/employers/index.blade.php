@@ -30,11 +30,13 @@ new class extends Component {
     // Delete action
     public function delete($id): void
     {
-        DB::transaction(function () use ($id) {
-            User::find($id)->deleteSkills();
-            User::find($id)->delete();
-        });
-        $this->warning("Deleted user #$id", '', position: 'toast-bottom'); 
+        if(auth()->user()->isAdmin()) {
+            DB::transaction(function () use ($id) {
+                User::find($id)->deleteSkills();
+                User::find($id)->delete();
+            });
+            $this->warning("Deleted user #$id", '', position: 'toast-bottom'); 
+        }
     }
 
     // Table headers
@@ -92,9 +94,11 @@ new class extends Component {
         </x-slot:middle>
         <x-slot:actions>
             {{-- <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" /> --}}
+            @if(auth()->user()->isAdmin())
             <x-button icon="o-user-plus" class="btn-primary" link="{{route('employers.create')}}">
                 Add employer
             </x-button>
+            @endif
         </x-slot:actions>
     </x-header>
 
@@ -104,13 +108,14 @@ new class extends Component {
             @scope('cell_avatar', $user)
                 <img class="rounded-full" src="{{$user->avatar ?? "/empty-user.jpg"}}" />
             @endscope
+            @if(auth()->user()->isAdmin())
             @scope('actions', $user)
             <div class="flex flex-nowrap gap-2">
                 <x-button link="{{ route('employers.edit', $user) }}" icon="o-pencil" class="btn-sm btn-ghost" />
                 <x-button icon="o-trash" wire:click="delete({{ $user['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
             </div>
-            
             @endscope
+            @endif
         </x-table>
     </x-card>
 

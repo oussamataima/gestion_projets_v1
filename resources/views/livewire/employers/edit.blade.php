@@ -54,6 +54,9 @@ new class extends Component {
         
         public function save(): void
         {
+            if(!auth()->user()->isAdmin()) {
+                return;
+            }
 
             $data = $this->validate(); 
             $data['role'] = 'employer';

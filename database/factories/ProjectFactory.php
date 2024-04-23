@@ -19,7 +19,7 @@ class ProjectFactory extends Factory
     {
         return [
             'name' => fake()->company . ' Project',
-            'description' => fake()->text(200),
+            'description' => fake()->text(800),
             'start_date' => fake()->dateTimeBetween('-1 month', '+1 month'),
             'due_date' => fake()->dateTimeBetween('+1 month', '+3 months'),
             'status' => fake()->randomElement(['pending', 'in_progress', 'completed']),
