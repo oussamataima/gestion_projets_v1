@@ -35,7 +35,7 @@ new class extends Component {
     #[Validate('required')]
     public array $skills;
     
-    public string $password = '';
+    public ?string $password;
     
     public function rules()
     {
@@ -61,13 +61,14 @@ new class extends Component {
             $data = $this->validate(); 
             $data['role'] = 'employer';
             $data['profession_id'] = $this->profession_id;
+            if($this->password) {
+                $data['password'] = $this->password;
+            }
             $this->user->update($data);
             $this->user->skills()->sync($this->skills);
 
             if($this->avatar !== $this->user->avatar) {
                 $url = $this->avatar->store('users', 'public');
-                // $this->user->update(['avatar' => $url]);
-                // dd($this->avatar);
                 $this->user->update(['avatar' => url("/storage/$url")]);
 
             }

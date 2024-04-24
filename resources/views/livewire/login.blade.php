@@ -39,10 +39,11 @@ class extends Component {
 }
 ?>
 
-<div class= "md:w-96 mx-auto mt-20">
-    <div class="mb-10">Cool image here</div>
+<div class= "flex h-screen">
  
-    <x-form wire:submit="login">
+    <x-form class="md:w-[420px] m-auto" wire:submit="login">
+        <x-errors title="Oops!" description="Please, fix them." icon="o-face-frown" />
+
         <x-input label="Username" wire:model="username" icon="o-envelope" inline />
         <x-input label="Password" wire:model="password" type="password" icon="o-key" inline />
  

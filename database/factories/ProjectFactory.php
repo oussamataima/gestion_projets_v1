@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Project;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -24,7 +25,7 @@ class ProjectFactory extends Factory
             'due_date' => fake()->dateTimeBetween('+1 month', '+3 months'),
             'status' => fake()->randomElement(['pending', 'in_progress', 'completed']),
             'created_by' => $this->getRandomAdminId(),
-            'assigned_to' => null, 
+            'assigned_to' => $this->getRandomManagerId(),
         ];
     }
 
@@ -37,5 +38,23 @@ class ProjectFactory extends Factory
         } else {
             throw new \Exception('No admin user found to create project.');
         }
+    }
+    private function getRandomManagerId()
+    {
+        // Logic to find a random user with the "admin" role
+        $managerUser = User::where('role', 'manager')->inRandomOrder()->first();
+        if ($managerUser) {
+            return $managerUser->id;
+        } else {
+            return null;
+        }
+    }
+
+    public function configure()
+    {
+        return $this->afterCreating(function (Project $project) {
+            $employers = User::where('role', 'employer')->inRandomOrder()->limit(5)->get()->pluck('id');
+            $project->employers()->attach($employers);
+        });
     }
 }

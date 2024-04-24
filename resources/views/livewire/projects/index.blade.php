@@ -54,24 +54,28 @@ new class extends Component {
     {
         return [
             ['key' => 'id', 'label' => '#', 'class' => 'w-20'],
-            ['key' => 'name', 'label' => 'Project name', 'class' => 'w-35'],
-            ['key' => 'start_date', 'label' => 'Start date', 'class' => 'w-28'],
-            ['key' => 'due_date', 'label' => 'Due date', 'class' => 'w-23'],
-            ['key' => 'status', 'label' => 'Status', 'class' => 'w-10'],
+            ['key' => 'name', 'label' => 'Project name', 'class' => 'w-42'],
+            ['key' => 'manager.full_name', 'label' => 'Manager', 'class' => 'w-36'],
+            ['key' => 'start_date', 'label' => 'Start date', 'class' => 'w-32'],
+            ['key' => 'due_date', 'label' => 'Due date', 'class' => 'w-32'],
+            ['key' => 'status', 'label' => 'Status', 'class' => 'w-20'],
         ];
     }
 
-    /**
-     * For demo purpose, this is a static collection.
-     *
-     * On real projects you do it with Eloquent collections.
-     * Please, refer to maryUI docs to see the eloquent examples.
-     */
+ 
     public function projects(): LengthAwarePaginator
-{
-    return Project::query()
-        ->paginate(10);
-}
+    {
+        $user = auth()->user();
+        if ($user->role === 'employer') {
+            $projects = $user->projects_employer()->with(['manager'])->paginate(10);
+        } elseif ($user->role === 'manager') {
+            $projects = $user->managedProjects()->with(['manager'])->paginate(10); // Verify relationship
+        } else {
+            $projects = Project::query()->with(['manager'])->paginate(10);
+        }
+
+        return $projects;
+    }
 
     public function with(): array
     {
@@ -84,7 +88,7 @@ new class extends Component {
 
 <div>
     <!-- HEADER -->
-    <x-header title="projects" separator progress-indicator>
+    <x-header title="Projects" separator progress-indicator>
         <x-slot:middle class="!justify-end">
             <x-input placeholder="Search..." wire:model.live.debounce="search" clearable icon="o-magnifying-glass" />
         </x-slot:middle>
@@ -98,9 +102,10 @@ new class extends Component {
         </x-slot:actions>
     </x-header>
 
+
     <!-- TABLE  -->
     <x-card>
-        <x-table :headers="$headers" :rows="$projects"  with-pagination link="/projects/{id}">
+        <x-table class="text-center" :headers="$headers" :rows="$projects"  with-pagination link="/projects/{id}">
             @if(auth()->user()->isAdmin())
                 @scope('actions', $project)
                     <div class="flex flex-nowrap gap-2">

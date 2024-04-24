@@ -77,12 +77,12 @@ new class extends Component {
                 option-sub-label="role"
                 option-avatar="avatar"
                 icon="o-user"
-                height="max-h-96" {{-- Default is `max-h-64`  --}}
+                height="max-h-96" 
                 single />
              <x-datepicker label="Start Date:" wire:model="start_date" icon="o-calendar" />
              <x-datepicker label="Due Date:" wire:model="due_date" icon="o-calendar" />
             <x-slot:actions>
-                <x-button label="Cancel" class="btn-ghost" link="/employer" />
+                <x-button label="Cancel" class="btn-ghost" link="/projects" />
                 <x-button label="Create" type="submit" icon="o-paper-airplane" class="btn-primary" spinner="register" />
             </x-slot:actions>
         </x-form>

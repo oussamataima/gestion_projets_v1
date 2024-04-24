@@ -74,10 +74,19 @@ class User extends Authenticatable
         return $this->belongsToMany(Project::class, 'project_user', 'user_id', 'project_id');
     }
 
+    public function assignedTasks()
+    {
+        return $this->hasMany(Task::class, 'assigned_to');
+    }
+
 
     public function isAdmin()
     {
         return $this->role === 'admin';
+    }
+    public function role()
+    {
+        return $this->role;
     }
 
     /**

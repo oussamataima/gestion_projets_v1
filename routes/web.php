@@ -39,6 +39,10 @@ Route::middleware('auth')->group(function () {
         Volt::route('/create', 'projects.create')->name('create');
         Volt::route('/{project}/edit', 'projects.edit')->name('edit');
         Volt::route('/{project}', 'projects.show')->name('show');
+
+        // tasks
+        Volt::route('/{project}/tasks/create', 'tasks.create');
+        Volt::route('/{project}/tasks/{task}/edit', 'tasks.edit');
     });
 });
 

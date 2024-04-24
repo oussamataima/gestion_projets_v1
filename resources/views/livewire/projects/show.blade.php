@@ -58,6 +58,23 @@ new class extends Component {
 
     }
 
+    public function headers(): array
+    {
+        return [
+            ['key' => 'title', 'label' => 'Title', 'class' => 'w-40'],
+            ['key' => 'due_date', 'label' => 'Due date', 'class' => 'w-32'],
+            ['key' => 'estimated_completion_time', 'label' => 'Estimate (hrs)', 'class' => 'w-20'],
+            ['key' => 'assigned_to', 'label' => 'Employer', 'class' => 'w-32'],
+            ['key' => 'status', 'label' => 'Status', 'class' => 'w-10'],
+        ];
+    }
+    public function with(): array
+    {
+        return [
+            'headers' => $this->headers()
+        ];
+    }
+
     
 
 
@@ -65,22 +82,15 @@ new class extends Component {
 }; ?>
 
 <div>
-   {{-- {{$project->employers}} --}}
+    {{-- {{$headers}} --}}
    <x-header class="!mb-0" :title="$project->name"  separator />
     <div>
-        <h2 class="text-xl font-bold">Description:</h2>
+        <h2 class="text-2xl font-bold">Description:</h2>
         <p>{{$project->description}}</p>
     </div>
     <div>
-        <h3 class="text-xl font-bold mb-4">Membres</h3>
-        <div class="max-w-[800px] mx-auto">
-            {{-- <x-choices
-            label="Searchable + Multiple"
-            wire:model="user_searchable_ids"
-            :options="$usersSearchable"
-            search-function="search"
-            no-result-text="Ops! Nothing here ..."
-            searchable /> --}}
+        <h3 class="text-2xl font-bold mb-4">Membres</h3>
+        <div class="max-w-xl mx-auto">
             <form wire:submit="add_member">
                 <x-choices
                     wire:model="selectedUserIds"
@@ -89,16 +99,12 @@ new class extends Component {
                     no-result-text="Ops! Nothing here ..."
                     searchable
                 >
-            </form>
                 {{-- Item slot--}}
                 @scope('item', $user)
                     <x-list-item :item="$user" sub-value="bio">
                         <x-slot:avatar>
                             <img class="rounded-full w-12" src="{{$user->avatar ?? "/empty-user.jpg"}}" alt="user avatar">
                         </x-slot:avatar>
-                        {{-- <x-slot:actions>
-                            <x-badge :value="$user->full_name" />
-                        </x-slot:actions> --}}
                         <x-slot:value>
                         {{$user->full_name}}
                     </x-slot:value>
@@ -107,15 +113,14 @@ new class extends Component {
                     </x-slot:sub-value>
                     </x-list-item>
                 @endscope
-             
-                {{-- Selection slot--}}
                 @scope('selection', $user)
                     {{ $user->full_name }}
-                @endscope
-                <x-slot:append>
-                    <x-button type="submit" label="Add member" icon="o-plus" class="rounded-l-none btn-primary" />
-                </x-slot:append>
-            </x-choices>
+                    @endscope
+                    <x-slot:append>
+                        <x-button type="submit" label="Add member" icon="o-plus" class="rounded-l-none btn-primary" />
+                    </x-slot:append>
+                </x-choices>
+            </form>
             @forelse ( $project->employers as $employer )
                 <x-list-item :item="$employer" >
                     <x-slot:avatar>
@@ -135,6 +140,61 @@ new class extends Component {
             @empty
                 No membre yet
             @endforelse
+        </div>
+    </div>
+    <div>
+        <div class="flex justify-between my-4">
+            <h3 class="text-2xl font-bold ">List tasks</h3>
+            <x-button label="Add task" icon="o-plus" class="btn-success" link="{{$project->id}}/tasks/create" />
+        </div>
+        <div>
+                <x-card>
+                    <x-table class="text-center" :headers="$headers" :rows="$project->tasks" >
+                            @scope('actions', $project)
+                                <div class="flex flex-nowrap gap-2">
+                                    <x-button link="{{ route('projects.edit', $project) }}" icon="o-pencil" class="btn-sm btn-ghost" />
+                                    <x-button icon="o-trash" wire:click="delete({{ $project['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
+                                </div>
+                            @endscope
+
+                            @scope('cell_assigned_to', $task)
+                                @php
+                                    $name = User::find($task->assigned_to)->full_name;
+                                    if (isset($name)) {
+                                    echo "<strong>$name</strong>";
+                                    } else {
+                                    echo 'Not found.'; 
+                                    }
+                                @endphp
+                            @endscope
+                            @scope('cell_due_date', $task)
+                                @php
+                                    $dateTimeObject = new DateTime($task->due_date); 
+                                    $formattedDate = $dateTimeObject->format('d F Y  H:i'); 
+                                    echo $formattedDate;
+                                    // dd($date)
+                                @endphp
+                            @endscope
+            
+                        @scope('cell_status', $task)
+                            @switch($task->status)
+                                @case("pending")
+                                    <x-badge value="{{$task->status}}" class="capitalize font-bold badge badge-outline badge-warning" />               
+                                @break
+                                @case("in_progress")
+                                    <x-badge value="{{$task->status}}" class="capitalize font-bold badge badge-outline badge-primary" />               
+                                @break
+                                @case("completed")
+                                    <x-badge value="{{$task->status}}" class="capitalize font-bold badge badge-outline badge-success" />               
+                                @break
+                            
+                                @default
+                                    
+                            @endswitch
+                        @endscope
+                       
+                    </x-table>
+                </x-card>
         </div>
     </div>
 </div>
