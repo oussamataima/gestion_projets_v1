@@ -17,10 +17,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // $this->call(ProfessionSeeder::class);
-        // $this->call(SkillSeeder::class);
-        // User::factory(100)->create();
-        // Project::factory(50)->create();
+        $this->call(ProfessionSeeder::class);
+        $this->call(SkillSeeder::class);
+        User::factory(100)->create();
+        Project::factory(50)->create();
         Task::factory(330)->create();
     }
 }
