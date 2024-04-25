@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Models\Project;
+use App\Models\Task;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
 
@@ -10,6 +11,7 @@ new class extends Component {
     use Toast;
 
     public Project $project;
+    public Task $task;
 
     // Selected option
     public ?array $user_searchable_ids;
@@ -75,6 +77,25 @@ new class extends Component {
         ];
     }
 
+    // Delete action
+    public function delete($id): void
+    {
+        if(!auth()->user()->isAdmin()) {
+                    return;
+                }
+        $project = task::find($id);
+
+        if ($project) {
+            DB::transaction(function () use ($project) {
+                // Supprimer le projet et ses éventuelles dépendances dans une transaction
+                $project->delete();
+            });
+
+            $this->warning("Deleted project #$id", '', position: 'toast-bottom'); // Message de confirmation
+        } else {
+            $this->warning("Project #$id not found", '', position: 'toast-bottom'); // Message si le projet n'est pas trouvé
+        }
+    }
     
 
 
@@ -152,7 +173,11 @@ new class extends Component {
                     <x-table class="text-center" :headers="$headers" :rows="$project->tasks" >
                             @scope('actions', $task , $project)
                                 <div class="flex flex-nowrap gap-2">
+<<<<<<< HEAD
                                     <x-button link="/projects/{{$project->id}}/tasks/{{$task->id}}/edit" icon="o-pencil" class="btn-sm btn-ghost" />
+=======
+                                    <x-button link="{{ route('projects.edit',$project, $project->task) }}" icon="o-pencil" class="btn-sm btn-ghost" />
+>>>>>>> 9a42726c0e600667e29506a7780cb943e53d821f
                                     <x-button icon="o-trash" wire:click="delete({{ $project['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
                                 </div>
                             @endscope
