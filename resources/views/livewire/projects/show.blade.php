@@ -11,6 +11,7 @@ new class extends Component {
     use Toast;
 
     public Project $project;
+    public Task $task;
 
     // Selected option
     public ?array $user_searchable_ids;
@@ -172,7 +173,7 @@ new class extends Component {
                     <x-table class="text-center" :headers="$headers" :rows="$project->tasks" >
                             @scope('actions', $project)
                                 <div class="flex flex-nowrap gap-2">
-                                    <x-button link="{{ route('projects.edit', $project) }}" icon="o-pencil" class="btn-sm btn-ghost" />
+                                    <x-button link="{{ route('projects.edit',$project, $project->task) }}" icon="o-pencil" class="btn-sm btn-ghost" />
                                     <x-button icon="o-trash" wire:click="delete({{ $project['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
                                 </div>
                             @endscope

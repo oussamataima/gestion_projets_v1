@@ -30,24 +30,50 @@ new class extends Component {
     }
 
     // Delete action
+    // public function delete($id): void
+    // {
+    //     if(!auth()->user()->isAdmin()) {
+    //                 return;
+    //             }
+    //     $project = Project::find($id);
+
+    //     if ($project) {
+    //         DB::transaction(function () use ($project) {
+    //             // Supprimer le projet et ses éventuelles dépendances dans une transaction
+    //             $project->delete();
+    //         });
+
+    //         $this->warning("Deleted project #$id", '', position: 'toast-bottom'); // Message de confirmation
+    //     } else {
+    //         $this->warning("Project #$id not found", '', position: 'toast-bottom'); // Message si le projet n'est pas trouvé
+    //     }
+    // }
+
+
+
     public function delete($id): void
     {
-        if(!auth()->user()->isAdmin()) {
-                    return;
-                }
+        if (!auth()->user()->isAdmin()) {
+            return;
+        }
+    
         $project = Project::find($id);
-
+    
         if ($project) {
             DB::transaction(function () use ($project) {
-                // Supprimer le projet et ses éventuelles dépendances dans une transaction
+                // Delete associated tasks
+                $project->tasks()->delete();
+    
+                // Then delete the project
                 $project->delete();
             });
-
-            $this->warning("Deleted project #$id", '', position: 'toast-bottom'); // Message de confirmation
+    
+            $this->warning("Deleted project #$id", '', position: 'toast-bottom');
         } else {
-            $this->warning("Project #$id not found", '', position: 'toast-bottom'); // Message si le projet n'est pas trouvé
+            $this->warning("Project #$id not found", '', position: 'toast-bottom');
         }
     }
+
 
     // Table headers
     public function headers(): array
