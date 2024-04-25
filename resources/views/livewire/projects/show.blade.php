@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Models\Project;
+use App\Models\Task;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
 
@@ -75,6 +76,25 @@ new class extends Component {
         ];
     }
 
+    // Delete action
+    public function delete($id): void
+    {
+        if(!auth()->user()->isAdmin()) {
+                    return;
+                }
+        $project = task::find($id);
+
+        if ($project) {
+            DB::transaction(function () use ($project) {
+                // Supprimer le projet et ses éventuelles dépendances dans une transaction
+                $project->delete();
+            });
+
+            $this->warning("Deleted project #$id", '', position: 'toast-bottom'); // Message de confirmation
+        } else {
+            $this->warning("Project #$id not found", '', position: 'toast-bottom'); // Message si le projet n'est pas trouvé
+        }
+    }
     
 
 
