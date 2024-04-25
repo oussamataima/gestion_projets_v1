@@ -7,7 +7,7 @@ use Mary\Traits\Toast;
 use Livewire\WithPagination;
 use Illuminate\Pagination\LengthAwarePaginator; 
 use Livewire\Attributes\Url;
-use App\Models\Project;
+use App\Models\Task;
 
 
 
@@ -53,43 +53,31 @@ new class extends Component {
     public function headers(): array
     {
         return [
-            ['key' => 'id', 'label' => '#', 'class' => 'w-20'],
-            ['key' => 'name', 'label' => 'Project name', 'class' => 'w-42'],
-            ['key' => 'manager.full_name', 'label' => 'Manager', 'class' => 'w-36'],
-            ['key' => 'start_date', 'label' => 'Start date', 'class' => 'w-32'],
+            ['key' => 'title', 'label' => 'Title', 'class' => 'w-40'],
+            ['key' => 'project.name', 'label' => 'Project name', 'class' => 'w-40'],
+            ['key' => 'assignedTo.full_name', 'label' => 'Manager', 'class' => 'w-40'],
             ['key' => 'due_date', 'label' => 'Due date', 'class' => 'w-32'],
-            ['key' => 'status', 'label' => 'Status', 'class' => 'w-20'],
+            ['key' => 'estimated_completion_time', 'label' => 'Estimate (hrs)', 'class' => 'w-20'],
+            ['key' => 'status', 'label' => 'Status', 'class' => 'w-10'],
         ];
     }
 
  
-    public function projects(): LengthAwarePaginator
+    public function tasks(): LengthAwarePaginator
     {
         $user = auth()->user();
-        if ($user->role === 'employer') {
-            $projects = $user->projects_employer()
-                            ->with(['manager'])
-                            ->where('name', 'like', "%$this->search%")
-                            ->paginate(10);
-        } elseif ($user->role === 'manager') {
-            $projects = $user->managedProjects()
-                            ->with(['manager'])
-                            ->where('name', 'like', "%$this->search%")
-                            ->paginate(10); // Verify relationship
-        } else {
-            $projects = Project::query()
-                            ->with(['manager'])
-                            ->where('name', 'like', "%$this->search%")
-                            ->paginate(10);
-        }
 
-        return $projects;
+        return $user->assignedTasks()
+                    ->with(['project'])
+                    ->with(['assignedTo'])
+                    ->where('title', 'like', "%$this->search%")
+                    ->paginate(10);
     }
 
     public function with(): array
     {
         return [
-            'projects' => $this->projects(),
+            'tasks' => $this->tasks(),
             'headers' => $this->headers()
         ];
     }
@@ -97,43 +85,31 @@ new class extends Component {
 
 <div>
     <!-- HEADER -->
-    <x-header title="Projects" separator progress-indicator>
+    <x-header title="My tasks" separator progress-indicator>
         <x-slot:middle class="!justify-end">
             <x-input placeholder="Search..." wire:model.live.debounce="search" clearable icon="o-magnifying-glass" />
         </x-slot:middle>
         <x-slot:actions>
             {{-- <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" /> --}}
-            @if(auth()->user()->isAdmin())
-            <x-button icon="o-plus" class="btn-primary" link="{{route('projects.create')}}">
-                Add project
-            </x-button>
-            @endif
+        
         </x-slot:actions>
     </x-header>
 
 
     <!-- TABLE  -->
     <x-card>
-        <x-table class="text-center" :headers="$headers" :rows="$projects"  with-pagination link="/projects/{id}">
-            @if(auth()->user()->isAdmin())
-                @scope('actions', $project)
-                    <div class="flex flex-nowrap gap-2">
-                        <x-button link="{{ route('projects.edit', $project) }}" icon="o-pencil" class="btn-sm btn-ghost" />
-                        <x-button icon="o-trash" wire:click="delete({{ $project['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
-                    </div>
-                @endscope
-            @endif
+        <x-table class="text-center" :headers="$headers" :rows="$tasks"  with-pagination link="/tasks/{id}">
 
-            @scope('cell_status', $project)
-                @switch($project->status)
+            @scope('cell_status', $task)
+                @switch($task->status)
                     @case("pending")
-                        <x-badge value="{{$project->status}}" class="capitalize badge badge-outline badge-warning" />               
+                        <x-badge value="{{$task->status}}" class="capitalize badge badge-outline badge-warning" />               
                     @break
                     @case("in_progress")
-                        <x-badge value="{{$project->status}}" class="capitalize badge badge-outline badge-primary" />               
+                        <x-badge value="{{$task->status}}" class="capitalize badge badge-outline badge-primary" />               
                     @break
                     @case("completed")
-                        <x-badge value="{{$project->status}}" class="capitalize badge badge-outline badge-success" />               
+                        <x-badge value="{{$task->status}}" class="capitalize badge badge-outline badge-success" />               
                     @break
                 
                     @default

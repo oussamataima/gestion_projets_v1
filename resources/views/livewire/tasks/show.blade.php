@@ -9,8 +9,6 @@ use Livewire\Attributes\Url;
 
 require app_path('Http/helpers.php');
 
-new
-#[Layout('components.layouts.app')]
 
 new class extends Component {
     use Toast;
@@ -56,11 +54,9 @@ new class extends Component {
             <p class="my-2 max-w-[900px] mx-auto">{{$task->description}}</p>     
         @endisset
     </div>
-    <button wire:click="$alert('Post saved!')" >button 1</button>
+    <button wire:click="alert('Post saved!')" >button 1</button>
 </div>
 
 
 
 
-
-</div>

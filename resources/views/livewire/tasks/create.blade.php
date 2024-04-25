@@ -43,7 +43,7 @@ new class extends Component {
             // dd($data);
             $task = Task::create($data);
             if($task) {
-                $this->success('Project has been created', redirectTo: route('projects.index'));
+                $this->success('Project has been created', redirectTo: route('projects.show',$this->project));
             } else {
                 $this->success('something went wrong');       
             }
