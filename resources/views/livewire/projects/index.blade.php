@@ -98,10 +98,11 @@ new class extends Component {
                             ->where('name', 'like', "%$this->search%")
                             ->paginate(10);
         } elseif ($user->role === 'manager') {
-            $projects = $user->managedProjects()
+            $projects = Project::query()
                             ->with(['manager'])
                             ->where('name', 'like', "%$this->search%")
-                            ->paginate(10); // Verify relationship
+                            ->where('assigned_to', $user->id)
+                            ->paginate(10);
         } else {
             $projects = Project::query()
                             ->with(['manager'])

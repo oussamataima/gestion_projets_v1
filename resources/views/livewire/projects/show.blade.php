@@ -172,10 +172,25 @@ new class extends Component {
         <div>
                 <x-card>
                     <x-table class="text-center" :headers="$headers" :rows="$project->tasks" >
+
                             @scope('actions', $task , $project)
                                 <div class="flex flex-nowrap gap-2">
                                     <x-button link="/projects/{{$project->id}}/tasks/{{$task->id}}/edit" icon="o-pencil" class="btn-sm btn-ghost" />
                                     <x-button icon="o-trash" wire:click="delete( '{{ $task['id'] }}')" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
+                                    @endscope
+                            @scope('actions',$task, $project)
+                                <div class="flex flex-nowrap gap-2">
+                                    <x-button link="/projects/{{$project->id}}/tasks/{{$task->id}}/edit" icon="o-pencil" class="btn-sm btn-ghost" />
+                                    @endscope
+                            @scope('actions', $task , $project)
+                                <div class="flex flex-nowrap gap-2">
+
+                                    
+
+
+                                    <x-button link="{{ route('projects.edit',$project, $project->task) }}" icon="o-pencil" class="btn-sm btn-ghost" />
+                                    <x-button icon="o-trash" wire:click="delete({{ $task['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
+
                                 </div>
                             @endscope
 

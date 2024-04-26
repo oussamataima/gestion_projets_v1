@@ -64,10 +64,10 @@ class User extends Authenticatable
      * Get the projects that the manager is assigned to .
      * 
      */
-    public function managedProjects()
-    {
-        return $this->belongsToMany(Project::class, 'assigned_to');
-    }
+    // public function managedProjects()
+    // {
+    //     return $this->belongsToMany(Project::class, 'assigned_to' );
+    // }
 
     public function projects_employer()
     {
