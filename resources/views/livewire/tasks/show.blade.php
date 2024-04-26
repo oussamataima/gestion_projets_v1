@@ -89,8 +89,15 @@ new class extends Component {
           <p class="my-2 max-w-[900px] mx-auto">{{$task->description}}</p>     
       @endisset
     </div>
+<<<<<<< HEAD
     @endif
    
+=======
+<<<<<<< HEAD
+    <button wire:click="alert('Post saved!')" >button 1</button>
+</div>
+=======
+>>>>>>> 79958eb708c7b4398337fa476079130a2ae0b5f8
     <div>
       {{-- @php
         $time = strtotime($task->due_date);
@@ -203,3 +210,4 @@ new class extends Component {
 
 
 
+>>>>>>> a39374a4fc241d2fa0cc8fe31fccd707d319a104

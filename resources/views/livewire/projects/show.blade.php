@@ -2,7 +2,7 @@
 
 use App\Models\User;
 use App\Models\Project;
-use App\Models\Task;
+use App\Models\task;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
 
@@ -11,7 +11,7 @@ new class extends Component {
     use Toast;
 
     public Project $project;
-    public task $task;
+    public Task $task;
 
     // Selected option
     public ?array $user_searchable_ids;
@@ -60,6 +60,26 @@ new class extends Component {
 
     }
 
+    public function delete( $id): void
+{
+    if (!auth()->user()->isAdmin()) {
+        return;
+    }
+
+    $task = Task::find($id);
+    
+    if ($task) {
+        DB::transaction(function () use ($task) {
+            // Delete the task
+            $task->delete();
+        });
+
+        $this->warning("Deleted Task #$id", '', position: 'toast-bottom');
+    } else {
+        $this->warning("Task #$id not found", '', position: 'toast-bottom');
+    }
+}
+
     public function headers(): array
     {
         return [
@@ -77,23 +97,6 @@ new class extends Component {
         ];
     }
 
-    // Delete action
-    public function delete($id): void
-    {
-        if(!auth()->user()->isAdmin()) {
-                    return;
-                }
-        $task = task::find($id);
-        if ($task) {
-            DB::transaction(function () use ($task) {
-                // Supprimer le projet et ses éventuelles dépendances dans une transaction
-                $task->delete();
-            });
-            $this->warning("Deleted Task #$id", '', position: 'toast-bottom'); // Message de confirmation
-        } else {
-            $this->warning("Task #$id not found", '', position: 'toast-bottom'); // Message si le projet n'est pas trouvé
-        }
-    }
     
 
 
@@ -169,9 +172,16 @@ new class extends Component {
         <div>
                 <x-card>
                     <x-table class="text-center" :headers="$headers" :rows="$project->tasks" >
+
+                            @scope('actions', $task , $project)
+                                <div class="flex flex-nowrap gap-2">
+                                    <x-button link="/projects/{{$project->id}}/tasks/{{$task->id}}/edit" icon="o-pencil" class="btn-sm btn-ghost" />
+                                    <x-button icon="o-trash" wire:click="delete( '{{ $task['id'] }}')" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
+                                    @endscope
                             @scope('actions',$task, $project)
                                 <div class="flex flex-nowrap gap-2">
                                     <x-button link="/projects/{{$project->id}}/tasks/{{$task->id}}/edit" icon="o-pencil" class="btn-sm btn-ghost" />
+<<<<<<< HEAD
                                 </div>
                             @endscope
                             @scope('actions', $task , $project)
@@ -179,6 +189,18 @@ new class extends Component {
 
                                     <x-button link="/projects/{{$project->id}}/tasks/{{$task->id}}/edit" icon="o-pencil" class="btn-sm btn-ghost" />
                                     <x-button icon="o-trash" wire:click="delete({{ $project['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
+=======
+                                    @endscope
+                            @scope('actions', $task , $project)
+                                <div class="flex flex-nowrap gap-2">
+
+                                    
+
+
+                                    <x-button link="{{ route('projects.edit',$project, $project->task) }}" icon="o-pencil" class="btn-sm btn-ghost" />
+                                    <x-button icon="o-trash" wire:click="delete({{ $task['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
+
+>>>>>>> 79958eb708c7b4398337fa476079130a2ae0b5f8
                                 </div>
                             @endscope
 
