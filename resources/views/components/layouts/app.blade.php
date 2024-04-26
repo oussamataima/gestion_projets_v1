@@ -53,12 +53,17 @@
                 @endif
 
                 <x-menu-item title="Dashboard" icon="o-sparkles" link="/" />
-
-                <x-menu-sub title="Users" icon="o-user-group">
-                    <x-menu-item title="Employers" icon="o-user" link="{{route('employers.index')}}" />
-                    <x-menu-item title="Managers" icon="o-user" link="{{route('managers.index')}}" />
-                </x-menu-sub>
+                @if (auth()->user()->role !== "employer")
+                    <x-menu-sub title="Users" icon="o-user-group">
+                        <x-menu-item title="Employers" icon="o-user" link="{{route('employers.index')}}" />
+                        <x-menu-item title="Managers" icon="o-user" link="{{route('managers.index')}}" />
+                    </x-menu-sub>
+                    
+                @endif
                 <x-menu-item title="Projects" icon="o-square-2-stack" link="{{route('projects.index')}}" />
+                @if(auth()->user()->role === "employer")
+                    <x-menu-item title="My tasks" icon="o-view-columns" link="{{route('tasks.index')}}" />
+                @endif
             </x-menu>
         </x-slot:sidebar>
 

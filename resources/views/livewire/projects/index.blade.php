@@ -93,11 +93,20 @@ new class extends Component {
     {
         $user = auth()->user();
         if ($user->role === 'employer') {
-            $projects = $user->projects_employer()->with(['manager'])->paginate(10);
+            $projects = $user->projects_employer()
+                            ->with(['manager'])
+                            ->where('name', 'like', "%$this->search%")
+                            ->paginate(10);
         } elseif ($user->role === 'manager') {
-            $projects = $user->managedProjects()->with(['manager'])->paginate(10); // Verify relationship
+            $projects = $user->managedProjects()
+                            ->with(['manager'])
+                            ->where('name', 'like', "%$this->search%")
+                            ->paginate(10); // Verify relationship
         } else {
-            $projects = Project::query()->with(['manager'])->paginate(10);
+            $projects = Project::query()
+                            ->with(['manager'])
+                            ->where('name', 'like', "%$this->search%")
+                            ->paginate(10);
         }
 
         return $projects;
@@ -171,6 +180,3 @@ new class extends Component {
         </x-slot:actions>
     </x-drawer>
 </div>
-{{-- <h1>list users
-
-</h1> --}}
