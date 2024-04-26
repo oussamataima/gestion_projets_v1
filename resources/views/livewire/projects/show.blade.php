@@ -11,7 +11,7 @@ new class extends Component {
     use Toast;
 
     public Project $project;
-    public Task $task;
+    public task $task;
 
     // Selected option
     public ?array $user_searchable_ids;
@@ -83,17 +83,15 @@ new class extends Component {
         if(!auth()->user()->isAdmin()) {
                     return;
                 }
-        $project = task::find($id);
-
-        if ($project) {
-            DB::transaction(function () use ($project) {
+        $task = task::find($id);
+        if ($task) {
+            DB::transaction(function () use ($task) {
                 // Supprimer le projet et ses éventuelles dépendances dans une transaction
-                $project->delete();
+                $task->delete();
             });
-
-            $this->warning("Deleted project #$id", '', position: 'toast-bottom'); // Message de confirmation
+            $this->warning("Deleted Task #$id", '', position: 'toast-bottom'); // Message de confirmation
         } else {
-            $this->warning("Project #$id not found", '', position: 'toast-bottom'); // Message si le projet n'est pas trouvé
+            $this->warning("Task #$id not found", '', position: 'toast-bottom'); // Message si le projet n'est pas trouvé
         }
     }
     
@@ -171,9 +169,9 @@ new class extends Component {
         <div>
                 <x-card>
                     <x-table class="text-center" :headers="$headers" :rows="$project->tasks" >
-                            @scope('actions', $project)
+                            @scope('actions',$task, $project)
                                 <div class="flex flex-nowrap gap-2">
-                                    <x-button link="{{ route('projects.edit',$project, $project->task) }}" icon="o-pencil" class="btn-sm btn-ghost" />
+                                    <x-button link="/projects/{{$project->id}}/tasks/{{$task->id}}/edit" icon="o-pencil" class="btn-sm btn-ghost" />
                                     <x-button icon="o-trash" wire:click="delete({{ $project['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
                                 </div>
                             @endscope
