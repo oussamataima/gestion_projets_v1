@@ -56,7 +56,3 @@ new class extends Component {
     </div>
     <button wire:click="alert('Post saved!')" >button 1</button>
 </div>
-
-
-
-
