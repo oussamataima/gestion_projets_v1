@@ -52,7 +52,7 @@ new class extends Component {
             $data['assigned_to'] = $this->assigned_to;
             $Task = $this->task->update($data);
             if($Task) {
-                $this->warning('Task has been updated', redirectTo: route('projects.index'));
+                $this->warning('Task has been updated', redirectTo: route('projects.show',$this->project));
             } else {
                 $this->error('something went wrong');       
             }
