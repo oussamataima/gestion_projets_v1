@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Models\Profession;
 use Illuminate\Support\Collection;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
@@ -15,6 +16,9 @@ new class extends Component {
 
     #[Url]
     public string $search = '';
+
+    #[Url]
+    public ?int $profession_id = 0;
 
     public bool $drawer = false;
 
@@ -50,38 +54,26 @@ new class extends Component {
             ['key' => 'email', 'label' => 'E-mail', 'sortable' => false],
         ];
     }
-
-    /**
-     * For demo purpose, this is a static collection.
-     *
-     * On real projects you do it with Eloquent collections.
-     * Please, refer to maryUI docs to see the eloquent examples.
-     */
     public function users(): LengthAwarePaginator
     {
-        // return collect([
-        //     ['id' => 1, 'name' => 'Mary', 'email' => 'mary@mary-ui.com', 'age' => 23],
-        //     ['id' => 2, 'name' => 'Giovanna', 'email' => 'giovanna@mary-ui.com', 'age' => 7],
-        //     ['id' => 3, 'name' => 'Marina', 'email' => 'marina@mary-ui.com', 'age' => 5],
-        // ])
-        //     ->sortBy([[...array_values($this->sortBy)]])
-        //     ->when($this->search, function (Collection $collection) {
-        //         return $collection->filter(fn(array $item) => str($item['name'])->contains($this->search, true));
-        //     });
 
-        return User::query()
+        $query = User::query()
         ->with(['profession'])
-        ->where('role','employer') 
-        ->where('full_name', 'like', "%$this->search%")
-        // ->orderBy(...array_values($this->sortBy))
-        ->paginate(10);
+        ->where('role', 'employer') 
+        ->where('full_name', 'like', "%$this->search%");
+
+        $query = $query->when($this->profession_id, function ($query) {
+            return $query->where('profession_id', $this->profession_id);
+        });
+        return $query->paginate(10);
     }
 
     public function with(): array
     {
         return [
             'users' => $this->users(),
-            'headers' => $this->headers()
+            'headers' => $this->headers(),
+            'professions' => Profession::all()
         ];
     }
 }; ?>
@@ -93,7 +85,7 @@ new class extends Component {
             <x-input placeholder="Search..." wire:model.live.debounce="search" clearable icon="o-magnifying-glass" />
         </x-slot:middle>
         <x-slot:actions>
-            {{-- <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" /> --}}
+            <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" />
             @if(auth()->user()->isAdmin())
             <x-button icon="o-user-plus" class="btn-primary" link="{{route('employers.create')}}">
                 Add employer
@@ -121,7 +113,8 @@ new class extends Component {
 
     <!-- FILTER DRAWER -->
     <x-drawer wire:model="drawer" title="Filters" right separator with-close-button class="lg:w-1/3">
-        <x-input placeholder="Search..." wire:model.live.debounce="search" icon="o-magnifying-glass" @keydown.enter="$wire.drawer = false" />
+        <x-input class="mb-2" placeholder="Search..." wire:model.live.debounce="search" icon="o-magnifying-glass" @keydown.enter="$wire.drawer = false" />
+        <x-select wire:model.live="profession_id" :options="$professions" label="Filter by profession" placeholder="All" placeholder-value="0" class="rounded-r-none" />
 
         <x-slot:actions>
             <x-button label="Reset" icon="o-x-mark" wire:click="clear" spinner />

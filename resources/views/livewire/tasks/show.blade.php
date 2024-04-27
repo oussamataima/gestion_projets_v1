@@ -44,11 +44,14 @@ new class extends Component {
 
       // Convert seconds to hours (round to 2 decimal places for precision)
       $hoursDifference = round($secondsDiff / 3600, 2);
-      $earned_points = $this->task->estimated_completion_time - $hoursDifference
+      // dd($hoursDifference);
+      $earned_points = ($this->task->estimated_completion_time - $hoursDifference)
                       * $this->task->task_points / $this->task->estimated_completion_time;
-      if($earned_points >= $this->task->task_points ) {
+      if($earned_points > $this->task->task_points ) {
         $earned_points = $this->task->task_points;
       }
+      // dd($earned_points);
+
                       
       $this->task->update(['status' => 'completed']);
       $this->task->update(['end_time' => $date1]);
@@ -136,6 +139,7 @@ new class extends Component {
       @endif
       <div class="my-4">
         <h3 class="text-lg">Task points: <span class="font-bold" >{{$task->task_points}} point </span></h3>
+        <h3 class="text-lg">Estimated completion time: <span class="font-bold" >{{$task->estimated_completion_time}} hrs </span></h3>
         @if ($task->status === "completed")
           <h3 class="text-lg">You earn: <span class="font-bold" >{{$task->earned_points}} point</span></h3>
         @endif
