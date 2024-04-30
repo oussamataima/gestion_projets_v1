@@ -22,6 +22,9 @@ new class extends Component {
 
     public array $sortBy = ['column' => 'name', 'direction' => 'asc'];
 
+    #[Url]
+    public string $state = '';
+
     // Clear filters
     public function clear(): void
     {
@@ -66,19 +69,25 @@ new class extends Component {
     public function tasks(): LengthAwarePaginator
     {
         $user = auth()->user();
+        $query = $user->assignedTasks()
+                        ->with(['project'])
+                        ->with(['assignedTo'])
+                        ->where('title', 'like', "%$this->search%");
+        if ($this->state && $this->state !=="all") {
+            $query->where('status', $this->state);
+        }      
+        
+        return $query->paginate(10);
+        
+        
 
-        return $user->assignedTasks()
-                    ->with(['project'])
-                    ->with(['assignedTo'])
-                    ->where('title', 'like', "%$this->search%")
-                    ->paginate(10);
     }
 
     public function with(): array
     {
         return [
             'tasks' => $this->tasks(),
-            'headers' => $this->headers()
+            'headers' => $this->headers(),
         ];
     }
 }; ?>
@@ -90,7 +99,7 @@ new class extends Component {
             <x-input placeholder="Search..." wire:model.live.debounce="search" clearable icon="o-magnifying-glass" />
         </x-slot:middle>
         <x-slot:actions>
-            {{-- <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" /> --}}
+            <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" />
         
         </x-slot:actions>
     </x-header>
@@ -123,7 +132,13 @@ new class extends Component {
     <!-- FILTER DRAWER -->
     <x-drawer wire:model="drawer" title="Filters" right separator with-close-button class="lg:w-1/3">
         <x-input placeholder="Search..." wire:model.live.debounce="search" icon="o-magnifying-glass" @keydown.enter="$wire.drawer = false" />
-
+        <select wire:model.live="state" class="select select-primary w-full mt-2">
+            <option disabled>Status</option>
+            <option value="all" >All</option>
+            <option value="pending">Pending</option>
+            <option value="in_progress">In progress</option>
+            <option value="completed">Completed</option>
+          </select>
         <x-slot:actions>
             <x-button label="Reset" icon="o-x-mark" wire:click="clear" spinner />
             <x-button label="Done" icon="o-check" class="btn-primary" @click="$wire.drawer = false" />

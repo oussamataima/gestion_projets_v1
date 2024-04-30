@@ -18,6 +18,9 @@ new class extends Component {
     #[Url]
     public string $search = '';
 
+    #[Url]
+    public string $state = '';
+
     public bool $drawer = false;
 
     public array $sortBy = ['column' => 'name', 'direction' => 'asc'];
@@ -28,27 +31,6 @@ new class extends Component {
         $this->reset();
         $this->success('Filters cleared.', position: 'toast-bottom');
     }
-
-    // Delete action
-    // public function delete($id): void
-    // {
-    //     if(!auth()->user()->isAdmin()) {
-    //                 return;
-    //             }
-    //     $project = Project::find($id);
-
-    //     if ($project) {
-    //         DB::transaction(function () use ($project) {
-    //             // Supprimer le projet et ses éventuelles dépendances dans une transaction
-    //             $project->delete();
-    //         });
-
-    //         $this->warning("Deleted project #$id", '', position: 'toast-bottom'); // Message de confirmation
-    //     } else {
-    //         $this->warning("Project #$id not found", '', position: 'toast-bottom'); // Message si le projet n'est pas trouvé
-    //     }
-    // }
-
 
 
     public function delete($id): void
@@ -92,25 +74,27 @@ new class extends Component {
     public function projects(): LengthAwarePaginator
     {
         $user = auth()->user();
+        $query ;
         if ($user->role === 'employer') {
-            $projects = $user->projects_employer()
+            $query = $user->projects_employer()
                             ->with(['manager'])
-                            ->where('name', 'like', "%$this->search%")
-                            ->paginate(10);
+                            ->where('name', 'like', "%$this->search%");
         } elseif ($user->role === 'manager') {
-            $projects = Project::query()
+            $query = Project::query()
                             ->with(['manager'])
                             ->where('name', 'like', "%$this->search%")
-                            ->where('assigned_to', $user->id)
-                            ->paginate(10);
+                            ->where('assigned_to', $user->id);
         } else {
-            $projects = Project::query()
+            $query = Project::query()
                             ->with(['manager'])
-                            ->where('name', 'like', "%$this->search%")
-                            ->paginate(10);
+                            ->where('name', 'like', "%$this->search%");
         }
 
-        return $projects;
+        if ($this->state && $this->state !=="all") {
+            $query->where('status', $this->state);
+        }
+
+        return $query->paginate(10);
     }
 
     public function with(): array
@@ -129,7 +113,7 @@ new class extends Component {
             <x-input placeholder="Search..." wire:model.live.debounce="search" clearable icon="o-magnifying-glass" />
         </x-slot:middle>
         <x-slot:actions>
-            {{-- <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" /> --}}
+            <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" />
             @if(auth()->user()->isAdmin())
             <x-button icon="o-plus" class="btn-primary" link="{{route('projects.create')}}">
                 Add project
@@ -174,6 +158,13 @@ new class extends Component {
     <!-- FILTER DRAWER -->
     <x-drawer wire:model="drawer" title="Filters" right separator with-close-button class="lg:w-1/3">
         <x-input placeholder="Search..." wire:model.live.debounce="search" icon="o-magnifying-glass" @keydown.enter="$wire.drawer = false" />
+        <select wire:model.live="state" class="select select-primary w-full mt-2">
+            <option disabled>Status</option>
+            <option value="all" >All</option>
+            <option value="pending">Pending</option>
+            <option value="in_progress">In progress</option>
+            <option value="completed">Completed</option>
+          </select>
 
         <x-slot:actions>
             <x-button label="Reset" icon="o-x-mark" wire:click="clear" spinner />
