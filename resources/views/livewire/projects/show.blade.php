@@ -110,6 +110,7 @@ new class extends Component {
         <h2 class="text-2xl font-bold">Description:</h2>
         <p>{{$project->description}}</p>
     </div>
+    @if(auth()->user()->role=='manager')
     <div>
         <h3 class="text-2xl font-bold mb-4">Membres</h3>
         <div class="max-w-xl mx-auto">
@@ -164,35 +165,27 @@ new class extends Component {
             @endforelse
         </div>
     </div>
+    @endif
     <div>
         <div class="flex justify-between my-4">
             <h3 class="text-2xl font-bold ">List tasks</h3>
+            @if(auth()->user()->role=='manager')
             <x-button label="Add task" icon="o-plus" class="btn-success" link="{{$project->id}}/tasks/create" />
+            @endif
         </div>
         <div>
                 <x-card>
                     <x-table class="text-center" :headers="$headers" :rows="$project->tasks" >
 
                             @scope('actions', $task , $project)
+                            @if(auth()->user()->role=='manager')
                                 <div class="flex flex-nowrap gap-2">
                                     <x-button link="/projects/{{$project->id}}/tasks/{{$task->id}}/edit" icon="o-pencil" class="btn-sm btn-ghost" />
                                     <x-button icon="o-trash" wire:click="delete( '{{ $task['id'] }}')" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
+                                   @endif
                                     @endscope
-                            @scope('actions',$task, $project)
-                                <div class="flex flex-nowrap gap-2">
-                                    <x-button link="/projects/{{$project->id}}/tasks/{{$task->id}}/edit" icon="o-pencil" class="btn-sm btn-ghost" />
-                                    @endscope
-                            @scope('actions', $task , $project)
-                                <div class="flex flex-nowrap gap-2">
-
-                                    
-
-
-                                    <x-button link="{{ route('projects.edit',$project, $project->task) }}" icon="o-pencil" class="btn-sm btn-ghost" />
-                                    <x-button icon="o-trash" wire:click="delete({{ $task['id'] }})" wire:confirm="Are you sure?" spinner class="btn-ghost btn-sm text-red-500" />
-
-                                </div>
-                            @endscope
+                            
+                            
 
                             @scope('cell_assigned_to', $task)
                                 @php
