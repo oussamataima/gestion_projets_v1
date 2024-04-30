@@ -62,9 +62,7 @@ new class extends Component {
 
     public function delete( $id): void
 {
-    if (!auth()->user()->isAdmin()) {
-        return;
-    }
+    
 
     $task = Task::find($id);
     
@@ -110,11 +108,11 @@ new class extends Component {
         <h2 class="text-2xl font-bold">Description:</h2>
         <p>{{$project->description}}</p>
     </div>
-    @if(auth()->user()->role=='manager')
     <div>
         <h3 class="text-2xl font-bold mb-4">Membres</h3>
-        <div class="max-w-xl mx-auto">
+        <div class="max-w-xl pl-8">
             <form wire:submit="add_member">
+                @if(auth()->user()->role=='manager')
                 <x-choices
                     wire:model="selectedUserIds"
                     :options="$usersSearchable"
@@ -122,6 +120,7 @@ new class extends Component {
                     no-result-text="Ops! Nothing here ..."
                     searchable
                 >
+                @endif
                 {{-- Item slot--}}
                 @scope('item', $user)
                     <x-list-item :item="$user" sub-value="bio">
@@ -139,9 +138,11 @@ new class extends Component {
                 @scope('selection', $user)
                     {{ $user->full_name }}
                     @endscope
+                    @if(auth()->user()->role=='manager')
                     <x-slot:append>
                         <x-button type="submit" label="Add member" icon="o-plus" class="rounded-l-none btn-primary" />
                     </x-slot:append>
+                    @endif
                 </x-choices>
             </form>
             @forelse ( $project->employers as $employer )
@@ -155,9 +156,11 @@ new class extends Component {
                     <x-slot:sub-value>
                         {{$employer->profession->name}}
                     </x-slot:sub-value>
+                    @if(auth()->user()->role=='manager')
                     <x-slot:actions>
                         <x-button icon="o-trash" class="text-red-500" wire:click="deleteMember({{ $employer['id'] }})" wire:confirm="Are you sure?" spinner />
                     </x-slot:actions>
+                    @endif
                 </x-list-item>
                 
             @empty
@@ -165,7 +168,6 @@ new class extends Component {
             @endforelse
         </div>
     </div>
-    @endif
     <div>
         <div class="flex justify-between my-4">
             <h3 class="text-2xl font-bold ">List tasks</h3>
@@ -174,7 +176,7 @@ new class extends Component {
             @endif
         </div>
         <div>
-                <x-card>
+            <x-card>
                     <x-table class="text-center" :headers="$headers" :rows="$project->tasks" >
 
                             @scope('actions', $task , $project)
@@ -224,7 +226,7 @@ new class extends Component {
                         @endscope
                        
                     </x-table>
-                </x-card>
+            </x-card>
         </div>
     </div>
 </div>
