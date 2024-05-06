@@ -26,8 +26,6 @@ function getTimeLeftObject($targetDate) {
   
     // Calculate remaining seconds using another modulo operation
     $seconds = $timeDiff % 60;
-  
-    // Create and return an object with time components
     return (object) [
         'days' => $days,
         'hours' => $hours,

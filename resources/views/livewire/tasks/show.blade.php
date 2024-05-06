@@ -191,10 +191,8 @@ new class extends Component {
         
         }, 1000);
         }
-        
-        // Listen for the page unload event
         window.onbeforeunload = function() {
-        // Clear the countdown interval
+
         clearInterval(countdownInterval);
         };
         
