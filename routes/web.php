@@ -19,7 +19,7 @@ Route::get('/logout', function () {
  
 // Protected routes here
 Route::middleware('auth')->group(function () {
-    Volt::route('/', 'employers.index');
+    Volt::route('/', 'projects.index');
     // Employers
     Route::name('employers.')->prefix('employers')->group(function () {
         Volt::route('/', 'employers.index')->name('index');
@@ -55,3 +55,6 @@ Route::middleware('auth')->group(function () {
     });
 });
 
+Route::fallback(function () {
+    return redirect('/');
+});

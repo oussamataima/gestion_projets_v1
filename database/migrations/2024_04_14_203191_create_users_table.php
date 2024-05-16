@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('username',50)->unique();
+            $table->string('username', 50)->unique();
             $table->string('password');
             $table->string('email')->unique()->nullable();
-            $table->string('role',20);
+            $table->string('role', 20);
             $table->string('full_name')->nullable();
             $table->string('avatar')->nullable();
             $table->foreignId('profession_id')->constrained();
@@ -31,7 +31,6 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
-
     }
 
     /**

@@ -5,15 +5,13 @@ use Illuminate\Support\Collection;
 use Livewire\Volt\Component;
 use Mary\Traits\Toast;
 use Livewire\WithPagination;
-use Illuminate\Pagination\LengthAwarePaginator; 
+use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\Attributes\Url;
 use App\Models\Task;
 
-
-
 new class extends Component {
     use Toast;
-    use WithPagination; 
+    use WithPagination;
 
     #[Url]
     public string $search = '';
@@ -35,9 +33,9 @@ new class extends Component {
     // Delete action
     public function delete($id): void
     {
-        if(!auth()->user()->isAdmin()) {
-                    return;
-                }
+        if (!auth()->user()->isAdmin()) {
+            return;
+        }
         $project = Project::find($id);
 
         if ($project) {
@@ -55,32 +53,22 @@ new class extends Component {
     // Table headers
     public function headers(): array
     {
-        return [
-            ['key' => 'title', 'label' => 'Title', 'class' => 'w-40'],
-            ['key' => 'project.name', 'label' => 'Project name', 'class' => 'w-40'],
-            ['key' => 'assignedTo.full_name', 'label' => 'Manager', 'class' => 'w-40'],
-            ['key' => 'due_date', 'label' => 'Due date', 'class' => 'w-32'],
-            ['key' => 'estimated_completion_time', 'label' => 'Estimate (hrs)', 'class' => 'w-20'],
-            ['key' => 'status', 'label' => 'Status', 'class' => 'w-10'],
-        ];
+        return [['key' => 'title', 'label' => 'Title', 'class' => 'w-40'], ['key' => 'project.name', 'label' => 'Project name', 'class' => 'w-40'], ['key' => 'assignedTo.full_name', 'label' => 'Manager', 'class' => 'w-40'], ['key' => 'due_date', 'label' => 'Due date', 'class' => 'w-32'], ['key' => 'estimated_completion_time', 'label' => 'Estimate (hrs)', 'class' => 'w-20'], ['key' => 'status', 'label' => 'Status', 'class' => 'w-10']];
     }
 
- 
     public function tasks(): LengthAwarePaginator
     {
         $user = auth()->user();
-        $query = $user->assignedTasks()
-                        ->with(['project'])
-                        ->with(['assignedTo'])
-                        ->where('title', 'like', "%$this->search%");
-        if ($this->state && $this->state !=="all") {
+        $query = $user
+            ->assignedTasks()
+            ->with(['project'])
+            ->with(['assignedTo'])
+            ->where('title', 'like', "%$this->search%");
+        if ($this->state && $this->state !== 'all') {
             $query->where('status', $this->state);
-        }      
-        
-        return $query->paginate(10);
-        
-        
+        }
 
+        return $query->paginate(10);
     }
 
     public function with(): array
@@ -100,45 +88,47 @@ new class extends Component {
         </x-slot:middle>
         <x-slot:actions>
             <x-button label="Filters" @click="$wire.drawer = true" responsive icon="o-funnel" />
-        
+
         </x-slot:actions>
     </x-header>
 
 
     <!-- TABLE  -->
     <x-card>
-        <x-table class="text-center" :headers="$headers" :rows="$tasks"  with-pagination link="/tasks/{id}">
+        <x-table class="text-center" :headers="$headers" :rows="$tasks" with-pagination link="/tasks/{id}">
 
             @scope('cell_status', $task)
                 @switch($task->status)
-                    @case("pending")
-                        <x-badge value="{{$task->status}}" class="capitalize badge badge-outline badge-warning" />               
+                    @case('pending')
+                        <x-badge value="{{ $task->status }}" class="capitalize badge badge-outline badge-warning" />
                     @break
-                    @case("in_progress")
-                        <x-badge value="{{$task->status}}" class="capitalize badge badge-outline badge-primary" />               
+
+                    @case('in_progress')
+                        <x-badge value="{{ $task->status }}" class="capitalize badge badge-outline badge-primary" />
                     @break
-                    @case("completed")
-                        <x-badge value="{{$task->status}}" class="capitalize badge badge-outline badge-success" />               
+
+                    @case('completed')
+                        <x-badge value="{{ $task->status }}" class="capitalize badge badge-outline badge-success" />
                     @break
-                
+
                     @default
-                        
                 @endswitch
             @endscope
-           
+
         </x-table>
     </x-card>
 
     <!-- FILTER DRAWER -->
     <x-drawer wire:model="drawer" title="Filters" right separator with-close-button class="lg:w-1/3">
-        <x-input placeholder="Search..." wire:model.live.debounce="search" icon="o-magnifying-glass" @keydown.enter="$wire.drawer = false" />
+        <x-input placeholder="Search..." wire:model.live.debounce="search" icon="o-magnifying-glass"
+            @keydown.enter="$wire.drawer = false" />
         <select wire:model.live="state" class="select select-primary w-full mt-2">
             <option disabled>Status</option>
-            <option value="all" >All</option>
+            <option value="all">All</option>
             <option value="pending">Pending</option>
             <option value="in_progress">In progress</option>
             <option value="completed">Completed</option>
-          </select>
+        </select>
         <x-slot:actions>
             <x-button label="Reset" icon="o-x-mark" wire:click="clear" spinner />
             <x-button label="Done" icon="o-check" class="btn-primary" @click="$wire.drawer = false" />

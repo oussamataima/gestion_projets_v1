@@ -65,6 +65,13 @@ php artisan migrate
 php artisan db:seed
 
 ```
+- Create user(admin)
+
+```bash
+
+php artisan admin:create admin password
+
+```
 
 - Run the development server (Ctrl+C to close)
 
